@@ -1,0 +1,6 @@
+[submodule "ucx"]
+	path = ucx
+	url = https://github.com/openucx/ucx.git
+[submodule "ompi"]
+	path = ompi
+	url = https://github.com/open-mpi/ompi.git
