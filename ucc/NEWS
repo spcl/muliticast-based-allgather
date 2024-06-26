@@ -1,0 +1,212 @@
+/**
+ * @copyright (c) 2021, NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+ *
+ * See file LICENSE for terms.
+ */
+
+## Current
+
+## 1.2.0 (June 6th, 2023)
+
+## New Features and Enhancements
+
+## CL/HIER
+
+- Fixed single proc on node issue in alltoall ([#658](https://github.com/openucx/ucc/pull/658))
+- Implemented allreduce rab pipelined ([#608](https://github.com/openucx/ucc/pull/608))
+- Added bcast 2step algorithm ([#620](https://github.com/openucx/ucc/pull/620))
+- Fixed allreduce rab pipeline ([#759](https://github.com/openucx/ucc/pull/759))
+
+##  TL/CUDA
+
+- Support for CUDA 12
+- Fixed cache unmap issue ([#642](https://github.com/openucx/ucc/pull/642))
+- Implemented reduce scatter linear ([#669](https://github.com/openucx/ucc/pull/669))
+- Added algorithm selection based on topology ([#688](https://github.com/openucx/ucc/pull/688))
+- Fixed linear algorithms ([#751](https://github.com/openucx/ucc/pull/751))
+- Fixed pipelining in linear rs ([#770](https://github.com/openucx/ucc/pull/770))
+
+## TL/UCP
+
+- Added special service worker ([#560](https://github.com/openucx/ucc/pull/560))
+- Added scatterv ([#663](https://github.com/openucx/ucc/pull/663))
+- Added gatherv ([#664](https://github.com/openucx/ucc/pull/664))
+- Fixed running with npolls 0 ([#695](https://github.com/openucx/ucc/pull/695))
+- Added knomial allgather ([#729](https://github.com/openucx/ucc/pull/729))
+- Fixed bug for triggered colls ([#757](https://github.com/openucx/ucc/pull/757))
+- Added bruck alltoall ([#756](https://github.com/openucx/ucc/pull/756))
+- Added SLOAV alltoallv ([#687](https://github.com/openucx/ucc/pull/687))
+- Large message broadcast optimizations ([#738](https://github.com/openucx/ucc/pull/738))
+- Ranks reordering in ring allgather for better locality([#69](https://github.com/openucx/ucc/pull/698))
+
+##  TL/SHARP
+
+- Fixed memory type check in allreduce ([#662](https://github.com/openucx/ucc/pull/662))
+- Added support for sharpv3 dt ([#661](https://github.com/openucx/ucc/pull/661))
+- Fixed assert check ([#686](https://github.com/openucx/ucc/pull/686))
+- Implemented SHARP OOB fixes ([#746](https://github.com/openucx/ucc/pull/746))
+- Fixed local rank when NODE SBGP not enabled ([#760](https://github.com/openucx/ucc/pull/760))
+- Prevented sharp team with team max ppn > 1 ([#761](https://github.com/openucx/ucc/pull/761))
+
+
+## CORE
+
+- Fixed memory type score update ([#650](https://github.com/openucx/ucc/pull/650))
+- Fixed ucc parser build ([#666](https://github.com/openucx/ucc/pull/666))
+- Implemented ucc_pipeline_params ([#675](https://github.com/openucx/ucc/pull/675))
+- Changed log level of config_modify ([#667](https://github.com/openucx/ucc/pull/667))
+- Fixed timeout handle for triggered post ([#679](https://github.com/openucx/ucc/pull/679))
+
+## DOCS
+- Added User Guide ([#720](https://github.com/openucx/ucc/pull/720))
+
+
+## 1.1.0 (October 7th, 2022)
+
+## Features
+
+## API
+- Added float 128 and float 32, 64, 128 (complex) data types
+- Added Active Sets based collectives to support dynamic groups as well as
+  point-to-point messaging
+- Added ucc_team_get_attr interface
+
+## Core
+- Config file support
+- Fixed component search
+
+## CL
+
+- Added split rail allreduce collective implementation
+- Enable hierarchical alltoallv and barrier
+- Fixed cleanup bugs
+
+
+## TL
+- Added SELF TL supporting team size one
+
+### UCP
+
+- Added service broadcast
+- Added reduce_scatterv ring algorithm
+- Added k-nomial based gather collective implementation
+- Added one-sided get based algorithms
+
+### SHARP
+- Fixed SHARP OOB
+- Added SHARP broadcast
+
+
+
+### GPU Collectives (CUDA, NCCL TL and RCCL TL)
+- Added support for CUDA TL (intranode collectives for NVIDIA GPUs)
+- Added multiring allgatherv, alltoall, reduce-scatter, and reduce-scatterv
+  multiring in CUDA TL
+- Added topo based ring construction in CUDA TL to maximize bandwidth
+- Added NCCL gather, scatter and its vector variant
+- Enable using multiple streams for collectives
+- Added support for RCCL gather (v), scatter (v), broadcast, allgather (v),
+  barrier, alltoall (v) and all reduce collectives
+- Added ROCm memory component
+- Adapted all GPU collectives to executor design
+
+
+### Tests
+- Added tests for triggered collectives in perftests
+- Fixed bugs in multi-threading tests
+
+### Utils
+- Added CPU model and vendor detection
+- Several bug fixes in all components
+
+## 1.0.0 (April 19th, 2022)
+
+### Features
+
+#### API
+- Added Avg reduce operation
+- Added nonblocking team destroy option
+- Added user-defined datatype definitions
+- Added Bfloat16 type
+- Clarify semantics of core abstractions including teams and context
+- Added timeout option
+
+#### Core
+- Added coll scoring and selection support
+- Added support for Triggered collectives
+- Added support for timeouts in collectives
+- Added support for team create without ep in post
+- Added support for multithreaded context progress
+- Added support for nonblocking team destroy
+
+#### CL 
+
+- Added support for hierarchical collectives
+- Added support for hierarchical allreduce collective operation
+- Added support for collectives based on one-sided communication routines
+
+
+#### TL
+- Added SHARP TL
+
+##### UCP
+
+- Added Bcast SAG algorithm for large messages 
+- Added Knomial based reduce algorithm 
+- Making allgather and alltoall agree with the API
+- Added SRA knomial allreduce algorithm
+- Added pairwise alltoall and alltoallv algorithms
+- Added allgather and allgatherv ring algorithms 
+- Added support for collective operations based on one-sided semantics
+- Added support for alltoall with one-sided transfer semantics
+- Bug fixes
+
+##### SHARP
+- Added support for switch based hardware collectives (SHARP)
+
+#### NCCL
+- Add support for NCCL allreduce, alltoall, alltoallv, barrier, reduce, reduce
+  scatter, bcast, allgather and allgatherv
+
+#### Tests
+- Updated tests to test the newly added algorithms and operations 
+
+
+## 0.1.0 (TBD)
+
+### Features
+
+#### API
+- UCC API to support library, contexts, teams, collective operations, execution
+  engine, memory types, and triggered operations
+
+#### Core
+- Added implementation for UCC abstractions - library, context, team,
+  collective operations, execution engine, memory types, and triggered
+  operations
+- Added support for memory types - CUDA, and CPU
+- Added support for configuring UCC library and contexts
+
+
+#### CL 
+
+- Added support for collectives, while the source and destination is either in
+  CPU or device (GPU) 
+- Added support for UCC_THREAD_MULTIPLE
+- Added support for CUDA stream-based collectives 
+
+
+#### TL
+
+- Added support for send/receive based collectives using UCX/UCP as a transport
+  layer
+- Support for basic collectives types including barrier, alltoall, alltoallv,
+  broadcast, allgather, allgatherv, allreduce was added in the UCP TL
+- Added support using NCCL as a transport layer
+- Support for collectives types including alltoall, alltoallv, allgather,
+  allgatherv, allreduce, and broadcast
+
+#### Tests
+
+- Added support for unit testing (gtest) infrastructure
+- Added support for MPI tests

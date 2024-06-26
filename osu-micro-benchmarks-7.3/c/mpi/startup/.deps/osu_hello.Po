@@ -1,0 +1,31 @@
+osu_hello.o: osu_hello.c /usr/include/stdc-predef.h \
+ /scratch/mkhalilov/openmpi-5.0.2/build/include/mpi.h \
+ /scratch/sshen/gcc-releases-gcc-11.4.0/install/lib/gcc/x86_64-linux-gnu/11.4.0/include/stddef.h \
+ /scratch/mkhalilov/openmpi-5.0.2/build/include/mpi_portable_platform.h \
+ /usr/include/stdio.h /usr/include/features.h /usr/include/sys/cdefs.h \
+ /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
+ /usr/include/gnu/stubs-64.h /usr/include/bits/types.h \
+ /usr/include/bits/typesizes.h /usr/include/libio.h \
+ /usr/include/_G_config.h /usr/include/wchar.h \
+ /scratch/sshen/gcc-releases-gcc-11.4.0/install/lib/gcc/x86_64-linux-gnu/11.4.0/include/stdarg.h \
+ /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
+ /usr/include/bits/stdio.h
+/usr/include/stdc-predef.h:
+/scratch/mkhalilov/openmpi-5.0.2/build/include/mpi.h:
+/scratch/sshen/gcc-releases-gcc-11.4.0/install/lib/gcc/x86_64-linux-gnu/11.4.0/include/stddef.h:
+/scratch/mkhalilov/openmpi-5.0.2/build/include/mpi_portable_platform.h:
+/usr/include/stdio.h:
+/usr/include/features.h:
+/usr/include/sys/cdefs.h:
+/usr/include/bits/wordsize.h:
+/usr/include/gnu/stubs.h:
+/usr/include/gnu/stubs-64.h:
+/usr/include/bits/types.h:
+/usr/include/bits/typesizes.h:
+/usr/include/libio.h:
+/usr/include/_G_config.h:
+/usr/include/wchar.h:
+/scratch/sshen/gcc-releases-gcc-11.4.0/install/lib/gcc/x86_64-linux-gnu/11.4.0/include/stdarg.h:
+/usr/include/bits/stdio_lim.h:
+/usr/include/bits/sys_errlist.h:
+/usr/include/bits/stdio.h:

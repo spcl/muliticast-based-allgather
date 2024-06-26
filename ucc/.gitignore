@@ -1,0 +1,97 @@
+# http://www.gnu.org/software/automake
+
+Makefile.in
+/ar-lib
+/mdate-sh
+/py-compile
+/test-driver
+/ylwrap
+
+# http://www.gnu.org/software/autoconf
+
+autom4te.cache
+/autoscan.log
+/autoscan-*.log
+/aclocal.m4
+/compile
+/config.guess
+/config.h.in
+/config.log
+/config.status
+/config.sub
+/configure
+/configure.scan
+/depcomp
+/install-sh
+/missing
+/stamp-h1
+
+
+# cmake and libtool files
+
+cmake/ucc-config-version.cmake
+cmake/ucc-config.cmake
+cmake/ucc-targets.cmake
+libtool
+
+# https://www.gnu.org/software/libtool/
+
+/ltmain.sh
+
+# http://www.gnu.org/software/texinfo
+
+/texinfo.tex
+
+# http://www.gnu.org/software/m4/
+
+m4/libtool.m4
+m4/ltoptions.m4
+m4/ltsugar.m4
+m4/ltversion.m4
+m4/lt~obsolete.m4
+
+# TLs generated Makefile
+config/m4/tls_list.m4
+src/components/tl/makefile.am
+
+# TL plugins generated Makefile
+config/m4/tl_coll_plugins_list.m4
+src/components/tl/ucp/makefile.coll_plugins.am
+
+# Generated Makefile
+# (meta build system like autotools,
+# can automatically generate from config.status script
+# (which is called by configure script))
+Makefile
+
+# IDEs
+.idea/
+.vscode
+*.code-workspace
+
+# Files and directories generated during compilation
+
+.libs
+.deps
+.dirstamp
+
+*.la
+*.lo
+*.o
+*.so
+*.a
+*.dwarf
+*.dSYM
+*.S
+*~
+
+config.h
+src/core/ucc_version.c
+src/ucc/api/ucc_version.h
+test/gtest/gtest
+test/mpi/ucc_test_mpi
+tools/info/build_config.h
+tools/info/ucc_info
+tools/perf/ucc_perftest
+modules
+

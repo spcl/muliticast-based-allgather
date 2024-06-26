@@ -1,0 +1,18 @@
+apps = [
+	'flexio_net_multi_process',
+	'flexio_net_multi_thread',
+	'flexio_event_handler',
+	'flexio_error_handling',
+	'flexio_multi_function',
+	'flexio_rpc',
+	'flexio_window',
+	'flexio_cmd_queue',
+	'flexio_ag_bench',
+	'qp_apps',
+]
+
+subdir('common')
+
+foreach name: apps
+	subdir(name)
+endforeach

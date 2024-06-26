@@ -1,0 +1,155 @@
+# SPDX-FileCopyrightText: Copyright (c) 2022 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause
+#
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted provided that the following conditions are met:
+#
+# 1. Redistributions of source code must retain the above copyright notice, this
+# list of conditions and the following disclaimer.
+#
+# 2. Redistributions in binary form must reproduce the above copyright notice,
+# this list of conditions and the following disclaimer in the documentation
+# and/or other materials provided with the distribution.
+#
+# 3. Neither the name of the copyright holder nor the names of its
+# contributors may be used to endorse or promote products derived from
+# this software without specific prior written permission.
+#
+# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+# AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+# IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+# DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+# FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+# DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+# SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+# CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+# OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+# OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+#
+
+project('flexio', ['c','cpp'],
+	license : 'NVIDIA Proprietary',
+	version : run_command('scripts/version.sh', check:true).stdout().strip()
+)
+
+app_common_inc = include_directories('apps/common')
+top_inc = include_directories('.')
+
+dir_base = meson.current_source_dir()
+c = meson.get_compiler('c', native: true)
+
+if(meson.version().version_compare('>=0.56.0'))
+	project_build_root = meson.project_build_root()
+else
+	project_build_root = meson.build_root()
+endif
+
+dpacc_build_dir = project_build_root
+
+# Targets that need the version should add c_args : c_args to use it
+c_args = '-DFLEXIO_VERSION="' + meson.project_version() + '"'
+
+tools = find_program(join_paths(meson.current_source_dir(), 'scripts', 'aux_tools.sh'))
+
+device_cc_args = []
+
+dpacc_build_script = find_program('build_dpacc.sh')
+
+if (get_option('verbose') < 2)
+	debug_dpacc = 'none'
+elif (get_option('verbose') == 2)
+	debug_dpacc = 'simple'
+elif (get_option('verbose') == 3)
+	debug_dpacc = 'detailed'
+elif (get_option('verbose') == 4)
+	debug_dpacc = 'detailed_keep'
+endif
+if (get_option('werror'))
+	device_cc_args += '-Werror'
+else
+	device_cc_args += '-Wno-error'
+endif
+meson_build_type = get_option('buildtype')
+if (meson_build_type == 'debug')
+	device_cc_args += ['-g', '-O0']
+	dpa_cc_options = []
+elif (meson_build_type == 'debugoptimized' or meson_build_type == '')
+	device_cc_args += ['-g', '-O2']
+	dpa_cc_options = ['-flto']
+elif (meson_build_type == 'release')
+	device_cc_args += '-O3'
+	dpa_cc_options = ['-flto']
+else
+	error('Unsupported build mode ', meson_build_type)
+endif
+device_cc_args += '-Wmissing-prototypes'
+device_cc_args += '-Wstrict-prototypes'
+device_cc_args += [
+		'-ffreestanding',
+		'-mcmodel=medany',
+	]
+# Generate source-level debug information with dwarf version 4
+# for compatible with gdb-multiarch lower then 10.1
+device_cc_args += '-gdwarf-4'
+if (get_option('en_simx_log') == true)
+	device_cc_args += '-DSIMX_BUILD'
+endif
+if (get_option('check_dev_input') == true)
+	device_cc_args += '-DCHECK_DEV_INPUT'
+endif
+
+inc_tgt_common = run_command(tools , '--list-all', join_paths(dir_base, 'common', '*.h'),
+			     check: true).stdout().strip().split('\n')
+
+c.find_library('flexio-libc',
+	       dirs: join_paths(dir_base, 'libflexio-libc/lib'),
+	       required: true)
+c.find_library('flexio_os',
+	       dirs: join_paths(dir_base, 'libflexio-os/lib'),
+	       required: true)
+lib_dev_sdk_path = 'libflexio-dev'
+lib_dev_sdk_name = 'flexio_dev'
+lib_app_common_name = 'app_common_dev'
+device_cc_params = ''
+foreach arg : device_cc_args
+	device_cc_params += ','+arg
+endforeach
+ibverbs_dep = dependency('libibverbs', native: true)
+mlx5_dep = dependency('libmlx5', native: true)
+thread_dep = dependency('threads', native: true)
+lib_sdk_path = 'libflexio'
+lib_sdk_name = 'flexio'
+lib_app_common_name = 'app_common_host'
+add_project_arguments('-Wmissing-prototypes', language:'c', native: true)
+add_project_arguments('-Wstrict-prototypes', language:'c', native: true)
+
+flexio_dev_lib_name = 'flexio_dev'
+if (meson.is_subproject())
+	flexiosdk_libflexio_os_dep = declare_dependency(
+		include_directories: top_inc,
+		link_args :['-L' + join_paths(meson.current_source_dir(), 'libflexio-os', 'lib'),
+			    '-lflexio_os'])
+
+	flexiosdk_libflexio_libc_dep = declare_dependency(
+		include_directories: top_inc,
+		link_args :['-L' + join_paths(meson.current_source_dir(), 'libflexio-libc', 'lib'),
+			    '-lflexio-libc'])
+endif
+
+if (get_option('unit-tests') == 'none')
+	subdir(lib_dev_sdk_path)
+	subdir(lib_sdk_path)
+	if (not meson.is_subproject())
+		if (not get_option('except_of').contains('A'))
+			subdir('apps')
+		endif
+		if (not get_option('except_of').contains('O'))
+			subdir('tools')
+		endif
+		if (not get_option('except_of').contains('T'))
+			subdir('tests')
+		endif
+	endif
+else
+	subdir('tests/unit_tests')
+endif

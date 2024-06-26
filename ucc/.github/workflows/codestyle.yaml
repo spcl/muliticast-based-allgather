@@ -1,0 +1,81 @@
+name: Codestyle
+
+on: [pull_request]
+
+env:
+  GIT_CF: https://raw.githubusercontent.com/llvm/llvm-project/release/11.x/clang/tools/clang-format/git-clang-format
+jobs:
+  check-codestyle:
+    runs-on: ubuntu-20.04
+    name: Check code style
+    steps:
+    - name: Install dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y --no-install-recommends wget lsb-core software-properties-common
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key| sudo apt-key add -
+        sudo apt-add-repository 'deb http://apt.llvm.org/focal/ llvm-toolchain-focal-11 main'
+        sudo apt-get install -y --no-install-recommends clang-format-11
+        curl -OL $GIT_CF && chmod +x ./git-clang-format && sudo mv ./git-clang-format /usr/bin/git-clang-format
+    - name: Checking out repository
+      uses: actions/checkout@v2
+      with:
+        ref: ${{ github.event.pull_request.head.sha }}
+        fetch-depth: 0
+    - name: Check commit title
+      run: |
+        set -eE
+        range="remotes/origin/$GITHUB_BASE_REF..HEAD"
+        check_title() {
+          msg=$1
+          if [ ${#msg} -gt 50 ]
+          then
+            if ! echo $msg | grep -qP '^Merge'
+            then
+              echo "Commit title is too long: ${#msg}"
+              return 1
+            fi
+          fi
+          H1="CODESTYLE|REVIEW|CORE|UTIL|TEST|API|DOCS|TOOLS|BUILD|MC|EC|SCHEDULE|TOPO"
+          H2="CI|CL/|TL/|MC/|EC/|UCP|SHM|NCCL|SHARP|BASIC|HIER|CUDA|CPU|EE|RCCL|ROCM|SELF|MLX5"
+          if ! echo $msg | grep -qP '^Merge |^'"(($H1)|($H2))"'+: \w'
+          then
+            echo "Wrong header"
+            return 1
+          fi
+          if [ "${msg: -1}" = "." ]
+          then
+            echo "Dot at the end of title"
+            return 1
+          fi
+          return 0
+        }
+        ok=1
+        for sha1 in `git log $range --format="%h"`
+        do
+          title=`git log -1 --format="%s" $sha1`
+          if check_title "$title"
+          then
+            echo "Good commit title: '$title'"
+          else
+            echo "Bad commit title: '$title'"
+            ok=0
+          fi
+          echo "--------------------------------------------------"
+        done
+        if [ $ok -ne 1 ]
+        then
+          exit 1
+        fi
+    - name: Check code format
+      run: |
+        set -eE
+        echo "Commit ${{ github.event.pull_request.base.sha }}"
+        diff=`git clang-format --binary=clang-format-11 --style=file --diff ${{ github.event.pull_request.base.sha }}`
+        if [ "$diff" = "no modified files to format" ] || [ "$diff" = "clang-format did not modify any files" ]
+        then
+          echo "Format check PASS"
+        else
+          echo "Please check code format:"
+          echo "$diff"
+        fi

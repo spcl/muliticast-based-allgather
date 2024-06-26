@@ -1,0 +1,4 @@
+FROM harbor.mellanox.com/ucx/fedora33:1
+
+RUN mkdir -p /opt/nvidia/src/ucc
+COPY . /opt/nvidia/src/ucc
