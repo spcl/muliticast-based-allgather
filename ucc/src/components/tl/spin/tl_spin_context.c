@@ -37,22 +37,14 @@ static ucc_status_t ucc_tl_spin_init_p2p_context(ucc_tl_spin_context_t *ctx)
     }
 
     if (!strcmp(ctx->cfg.ib_dev_name, "")) {
-        dev          = device_list[0];
-        devname      = (char *)ibv_get_device_name(dev);
-        ctx->devname = ucc_malloc(strlen(devname)+3, "devname");
-        if (!ctx->devname) {
-            status = UCC_ERR_NO_MEMORY;
-            goto free_dev_list;
-        }
-        memset(ctx->devname, 0, strlen(devname)+3);
-        memcpy(ctx->devname, devname, strlen(devname));
-        strncat(ctx->devname, ":1", 3);
+        dev = device_list[0];
     } else {
         ib_valid = 0;
         /* user has provided the devname now make sure it is valid */
         for (i = 0; device_list[i]; ++i) {
             if (!strcmp(ibv_get_device_name(device_list[i]), ctx->cfg.ib_dev_name)) {
                 ib_valid = 1;
+                dev = device_list[i];
                 break;
             }
         }
@@ -61,8 +53,16 @@ static ucc_status_t ucc_tl_spin_init_p2p_context(ucc_tl_spin_context_t *ctx)
             status = UCC_ERR_NOT_FOUND;
             goto free_dev_list;
         }
-        ctx->devname = ctx->cfg.ib_dev_name;
     }
+    devname = (char *)ibv_get_device_name(dev);
+    ctx->devname = ucc_malloc(strlen(devname)+3, "devname");
+    if (!ctx->devname) {
+        status = UCC_ERR_NO_MEMORY;
+        goto free_dev_list;
+    }
+    memset(ctx->devname, 0, strlen(devname)+3);
+    memcpy(ctx->devname, devname, strlen(devname));
+    strncat(ctx->devname, ":1", 3);
 
     ib = strdup(ctx->devname);
     ucc_string_split(ib, ":", 2, &ib_name, &port);
