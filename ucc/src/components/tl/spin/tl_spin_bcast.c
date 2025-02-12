@@ -243,7 +243,7 @@ ucc_tl_spin_coll_worker_tx_handler(ucc_tl_spin_worker_info_t *ctx, ucc_tl_spin_t
     return UCC_OK;
 }
 
-inline void
+static inline void
 ucc_tl_spin_coll_worker_rx_reliability_get_missing_ranks(ucc_tl_spin_worker_info_t *ctx, 
                                                          ucc_tl_spin_task_t *cur_task)
 {
